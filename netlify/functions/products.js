@@ -57,9 +57,16 @@ exports.handler = async (event, context) => {
         return jsonResponse(400, { message: "JSON format xato" });
       }
 
-      const { name, category, description, rating, imageKey, fileKey } = body;
+      const { name, category, description, rating, imageKey, fileKey, fileUrl, fileSizeMb } = body;
       if (!name || !category) {
         return jsonResponse(400, { message: "Nom va kategoriya majburiy" });
+      }
+      if (fileUrl && !/^https:\/\//i.test(fileUrl)) {
+        return jsonResponse(400, { message: "Katta fayl havolasi faqat HTTPS bo'lishi kerak" });
+      }
+      const sizeMb = Number(fileSizeMb) || 0;
+      if (sizeMb > 500) {
+        return jsonResponse(400, { message: "Fayl hajmi 500 MB dan oshmasin" });
       }
 
       const products = await getProducts(ctx);
@@ -73,6 +80,8 @@ exports.handler = async (event, context) => {
         rating: parseFloat(rating) || 0,
         imageKey: imageKey || null,
         fileKey: fileKey || null,
+        fileUrl: fileUrl || null,
+        fileSizeMb: sizeMb || null,
         createdAt: new Date().toISOString(),
       };
 

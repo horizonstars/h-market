@@ -3,207 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mahsulot — H Market</title>
+  <title>Mahsulot - H Market</title>
   <link rel="stylesheet" href="/styles.css" />
-  <style>
-    .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid var(--border);
-      border-top-color: var(--blue-deep);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .product-detail-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 48px;
-      align-items: start;
-    }
-
-    .product-detail-cover {
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1.5px solid var(--border);
-      box-shadow: var(--shadow-md);
-    }
-
-    .product-detail-img {
-      width: 100%;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-      display: block;
-    }
-
-    .product-detail-placeholder {
-      width: 100%;
-      aspect-ratio: 4/3;
-      background: var(--gradient-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 5rem;
-    }
-
-    .product-detail-info {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .product-detail-title {
-      font-family: 'Sora', sans-serif;
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--dark);
-      line-height: 1.2;
-    }
-
-    .product-detail-rating {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .product-detail-desc {
-      font-size: 1rem;
-      color: var(--text-muted);
-      line-height: 1.8;
-      background: var(--gradient-soft);
-      border-radius: var(--radius-sm);
-      padding: 16px 20px;
-      border-left: 3px solid var(--blue-mid);
-    }
-
-    .product-detail-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .meta-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .meta-label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .meta-val {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--dark);
-    }
-
-    .product-detail-actions {
-      margin-top: 8px;
-    }
-
-    .btn-download {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--gradient);
-      color: white;
-      text-decoration: none;
-      padding: 16px 32px;
-      border-radius: var(--radius-pill);
-      font-family: 'Nunito', sans-serif;
-      font-size: 1rem;
-      font-weight: 800;
-      cursor: pointer;
-      border: none;
-      box-shadow: 0 6px 24px rgba(0,102,255,0.3);
-      transition: all 0.2s;
-    }
-
-    .btn-download:hover:not(.disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 32px rgba(0,102,255,0.4);
-    }
-
-    .btn-download.disabled {
-      background: var(--border);
-      color: var(--text-muted);
-      box-shadow: none;
-      cursor: not-allowed;
-    }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.88rem;
-      margin-bottom: 32px;
-      transition: color 0.2s;
-    }
-
-    .back-link:hover { color: var(--blue-deep); }
-
-    @media (max-width: 768px) {
-      .product-detail-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-      }
-      .product-detail-title { font-size: 1.5rem; }
-    }
-  </style>
 </head>
 <body data-page="product">
-
-<!-- NAVBAR -->
-<nav class="navbar">
-  <div class="nav-container">
-    <a href="/" class="nav-logo">
-      <div class="nav-logo-icon">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <rect x="1" y="1" width="7" height="20" rx="3.5" fill="white"/>
-          <rect x="14" y="1" width="7" height="20" rx="3.5" fill="white"/>
-          <rect x="8" y="8.5" width="6" height="5" fill="white"/>
-          <polygon points="9.5,10 14,11.5 9.5,13" fill="#0066FF"/>
-        </svg>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="brand" aria-label="H Market bosh sahifa">
+        <span class="h-logo h-logo-small"><span></span></span>
+        <strong><span>H</span> Market</strong>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="/">Bosh sahifa</a>
+        <a href="/?category=Ilovalar">Ilovalar</a>
+        <a href="/?category=Saytlar">Saytlar</a>
+        <a href="/?category=Kitoblar">Kitoblar</a>
+        <a href="/?category=Jurnallar">Jurnallar</a>
+        <a href="/admin">Admin</a>
       </div>
-      <span class="nav-logo-text">H Market</span>
-    </a>
-    <ul class="nav-links" id="nav-links">
-      <li><a href="/">Bosh sahifa</a></li>
-      <li><a href="/?category=Ilovalar">Ilovalar</a></li>
-      <li><a href="/?category=Saytlar">Saytlar</a></li>
-      <li><a href="/?category=Kitoblar">Kitoblar</a></li>
-      <li><a href="/?category=Jurnallar">Jurnallar</a></li>
-      <li><a href="/#aloqa">Aloqa</a></li>
-    </ul>
-    <button class="hamburger" id="hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</nav>
+      <button class="hamburger" id="hamburger" aria-label="Menyuni ochish">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
 
-<main style="padding-top:90px;min-height:100vh">
-  <div class="section">
-    <a href="/" class="back-link">← Bosh sahifaga qaytish</a>
+  <main class="product-detail-wrap">
+    <a href="/" class="back-link">Bosh sahifaga qaytish</a>
     <div id="product-detail"></div>
-  </div>
-</main>
+  </main>
 
-<footer class="footer" style="margin-top:0">
-  <div class="footer-bottom" style="max-width:1280px;margin:0 auto">
-    <span>© 2025 H Market</span>
-    <span>Netlify bilan ishlaydi ⚡</span>
-  </div>
-</footer>
+  <footer class="footer">
+    <div><b><span>H</span> Market</b><p>Raqamli mahsulotlar markazi.</p></div>
+    <a href="/admin">Admin panel</a>
+  </footer>
 
-<script src="/app.js"></script>
+  <div class="download-modal" id="download-modal" hidden>
+    <div class="download-dialog">
+      <button type="button" class="dialog-close" id="download-close" aria-label="Yopish"></button>
+      <span class="shield-icon"></span>
+      <h2>Xavfsiz yuklab olish</h2>
+      <p id="download-text">Fayl HTTPS havola orqali ochiladi.</p>
+      <a href="#" id="download-confirm" class="btn-primary" rel="noopener noreferrer">Yuklab olish</a>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
 </body>
 </html>

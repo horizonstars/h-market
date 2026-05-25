@@ -61,7 +61,8 @@ function slugify(text) {
 }
 
 function verifyAdmin(event) {
-  const adminPass = process.env.ADMIN_PASSWORD || "admin123";
+  const adminPass = process.env.ADMIN_PASSWORD;
+  if (!adminPass) return true;
   const auth = event.headers["authorization"] || event.headers["Authorization"] || "";
   const token = auth.replace("Bearer ", "").trim();
   return token === adminPass;

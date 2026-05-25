@@ -1,9 +1,6 @@
-// ===== H Market App.js =====
-
 const API = "/.netlify/functions";
 
-// ===== UTILITIES =====
-function toast(msg, type = "info") {
+function toast(message, type = "info") {
   let container = document.querySelector(".toast-container");
   if (!container) {
     container = document.createElement("div");
@@ -12,262 +9,289 @@ function toast(msg, type = "info") {
   }
   const el = document.createElement("div");
   el.className = `toast ${type}`;
-  const icons = { success: "✅", error: "❌", info: "ℹ️" };
-  el.innerHTML = `<span>${icons[type] || "ℹ️"}</span><span>${msg}</span>`;
+  el.textContent = message;
   container.appendChild(el);
   setTimeout(() => {
     el.style.opacity = "0";
-    el.style.transition = "opacity 0.3s";
-    setTimeout(() => el.remove(), 300);
-  }, 4000);
-}
-
-function renderStars(rating) {
-  const r = Math.round(rating * 2) / 2;
-  let stars = "";
-  for (let i = 1; i <= 5; i++) {
-    if (i <= r) stars += "★";
-    else if (i - 0.5 === r) stars += "★";
-    else stars += "☆";
-  }
-  return stars;
-}
-
-function getCategoryIcon(cat) {
-  const icons = {
-    Ilovalar: "📱",
-    Saytlar: "🌐",
-    Kitoblar: "📚",
-    Jurnallar: "📰",
-  };
-  return icons[cat] || "📦";
-}
-
-function getCategoryPlaceholder(cat) {
-  return getCategoryIcon(cat);
+    el.style.transition = "opacity .25s ease";
+    setTimeout(() => el.remove(), 260);
+  }, 3600);
 }
 
 async function safeFetch(url, options = {}) {
   try {
     const res = await fetch(url, options);
     const text = await res.text();
-    if (!text || text.trim() === "") {
-      return { ok: false, status: res.status, data: { message: "Server bo'sh javob qaytardi" } };
-    }
-    let data;
+    let data = null;
     try {
-      data = JSON.parse(text);
+      data = text ? JSON.parse(text) : null;
     } catch {
-      data = { message: "Server JSON emas javob qaytardi: " + text.substring(0, 100) };
+      data = { message: text };
     }
     return { ok: res.ok, status: res.status, data };
   } catch (err) {
-    return { ok: false, status: 0, data: { message: "Tarmoq xatosi: " + err.message } };
+    return { ok: false, status: 0, data: { message: err.message } };
   }
 }
 
-// ===== PRODUCT RENDERING =====
-function renderProductCard(product) {
-  const icon = getCategoryIcon(product.category);
-  const imgHtml = product.imageKey
-    ? `<img src="${API}/file?key=${encodeURIComponent(product.imageKey)}" alt="${product.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\"product-cover-placeholder\\">${icon}</div>'">`
-    : `<div class="product-cover-placeholder">${icon}</div>`;
+function categoryAccent(category) {
+  return {
+    Ilovalar: "cat-green",
+    Saytlar: "cat-blue",
+    Kitoblar: "cat-purple",
+    Jurnallar: "cat-orange",
+  }[category] || "cat-blue";
+}
 
+function categoryIcon(category) {
+  return {
+    Ilovalar: "icon-grid",
+    Saytlar: "icon-globe",
+    Kitoblar: "icon-book",
+    Jurnallar: "icon-doc",
+  }[category] || "icon-grid";
+}
+
+function hLogoMarkup() {
+  return `<span class="h-logo"><span></span></span>`;
+}
+
+function renderStars(rating = 0) {
+  return `${Number(rating || 0).toFixed(1)} / 5`;
+}
+
+function fileUrlFor(product) {
+  if (product.fileUrl) return product.fileUrl;
+  if (product.fileKey) return `${API}/file?key=${encodeURIComponent(product.fileKey)}&download=1`;
+  return "";
+}
+
+function renderProductCard(product) {
+  const accent = categoryAccent(product.category);
+  const icon = categoryIcon(product.category);
+  const image = product.imageKey
+    ? `<img src="${API}/file?key=${encodeURIComponent(product.imageKey)}" alt="${escapeHtml(product.name)}" loading="lazy" onerror="this.parentElement.innerHTML='${hLogoMarkup().replace(/'/g, "&apos;")}'">`
+    : hLogoMarkup();
+
+  const hasFile = Boolean(fileUrlFor(product));
   return `
-    <a class="product-card" href="/product/${product.slug}" data-id="${product.id}">
-      <div class="product-cover">${imgHtml}</div>
+    <a class="product-card" href="/product/${encodeURIComponent(product.slug)}">
+      <div class="product-cover ${accent}">
+        <div class="product-cover-placeholder">${image}</div>
+      </div>
       <div class="product-body">
-        <span class="product-category-badge">${icon} ${product.category}</span>
-        <div class="product-name">${product.name}</div>
-        <div class="product-desc">${product.description || "Tavsif yo'q"}</div>
+        <span class="product-category-badge">${escapeHtml(product.category || "Mahsulot")}</span>
+        <div class="product-name">${escapeHtml(product.name || "Nomsiz mahsulot")}</div>
+        <div class="product-desc">${escapeHtml(product.description || "Tavsif qo'shilmagan.")}</div>
       </div>
       <div class="product-footer">
-        <div class="product-rating">
-          <span class="stars">${renderStars(product.rating || 0)}</span>
-          <span>${(product.rating || 0).toFixed(1)}</span>
-        </div>
-        <span class="product-dl-btn">⬇ Yuklab olish</span>
+        <div class="product-rating">${renderStars(product.rating)}</div>
+        <span class="product-dl-btn">${hasFile ? "Yuklab olish" : "Ko'rish"}</span>
       </div>
-    </a>
-  `;
+    </a>`;
 }
 
-function renderSkeletons(count = 8) {
-  return Array(count)
-    .fill(0)
-    .map(
-      () => `
-    <div class="skeleton-card">
-      <div class="skeleton skeleton-img"></div>
-      <div class="skeleton skeleton-line"></div>
-      <div class="skeleton skeleton-line short"></div>
-    </div>
-  `
-    )
-    .join("");
+function renderLoading() {
+  return `<div class="loading-state">Yuklanmoqda...</div>`;
 }
 
-// ===== HOME PAGE =====
+function renderEmpty(text) {
+  return `<div class="empty-state">${escapeHtml(text)}</div>`;
+}
+
 async function initHomePage() {
   const grid = document.getElementById("products-grid");
   if (!grid) return;
+  grid.innerHTML = renderLoading();
+  updateActiveTabs();
 
-  updateActiveCatTab();
-
-  if (grid) grid.innerHTML = renderSkeletons();
-
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(location.search);
   const category = params.get("category") || "";
   const search = params.get("search") || "";
-
-  let url = `${API}/products`;
   const q = new URLSearchParams();
   if (category) q.set("category", category);
   if (search) q.set("search", search);
-  if (q.toString()) url += "?" + q.toString();
 
-  const { ok, data } = await safeFetch(url);
-  const products = ok && Array.isArray(data) ? data : Array.isArray(data) ? data : [];
+  const { ok, data } = await safeFetch(`${API}/products${q.toString() ? `?${q}` : ""}`);
+  const products = ok && Array.isArray(data) ? data : [];
+  updateCounts(products);
 
-  if (!grid) return;
+  const title = document.getElementById("products-title");
+  if (title) {
+    if (category) title.textContent = category;
+    if (search) title.textContent = `"${search}" natijalari`;
+  }
 
-  if (products.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state" style="grid-column: 1/-1">
-        <div class="empty-icon">📦</div>
-        <div class="empty-title">Mahsulotlar topilmadi</div>
-        <div class="empty-text">Hozircha bu kategoriyada mahsulot yo'q. Admin panel orqali qo'shing.</div>
-      </div>`;
+  if (!products.length) {
+    grid.innerHTML = renderEmpty("Hozircha mahsulot yo'q. Admin paneldan yangi mahsulot qo'shing.");
+    return;
+  }
+  grid.innerHTML = products.slice().reverse().map(renderProductCard).join("");
+}
+
+async function initProductPage() {
+  const container = document.getElementById("product-detail");
+  if (!container) return;
+  container.innerHTML = renderLoading();
+
+  const slug = decodeURIComponent(location.pathname.replace("/product/", "").replace(/\/$/, ""));
+  const { ok, data } = await safeFetch(`${API}/products?slug=${encodeURIComponent(slug)}`);
+  if (!ok || !data || !data.name) {
+    container.innerHTML = renderEmpty("Mahsulot topilmadi.");
     return;
   }
 
-  grid.innerHTML = products.map(renderProductCard).join("");
+  const product = data;
+  const accent = categoryAccent(product.category);
+  const image = product.imageKey
+    ? `<img src="${API}/file?key=${encodeURIComponent(product.imageKey)}" alt="${escapeHtml(product.name)}" class="product-detail-img">`
+    : `<div class="product-detail-placeholder ${accent}">${hLogoMarkup()}</div>`;
+  const downloadUrl = fileUrlFor(product);
+  const fileSize = product.fileSizeMb ? `${product.fileSizeMb} MB gacha` : "Hajm ko'rsatilmagan";
 
-  // Update category counts
-  updateCategoryCounts(products, category);
-}
-
-function updateActiveCatTab() {
-  const params = new URLSearchParams(window.location.search);
-  const cat = params.get("category") || "";
-  document.querySelectorAll(".cat-tab").forEach((tab) => {
-    tab.classList.toggle("active", tab.dataset.cat === cat);
-  });
-}
-
-function updateCategoryCounts(products, activeCat) {
-  document.querySelectorAll(".cat-card-count").forEach((el) => {
-    const catName = el.dataset.cat;
-    if (catName) {
-      const count = products.filter((p) => p.category === catName).length;
-      el.textContent = count + " ta mahsulot";
-    }
-  });
+  document.title = `${product.name} - H Market`;
+  container.innerHTML = `
+    <div class="product-detail-grid">
+      <div class="product-detail-cover">${image}</div>
+      <div>
+        <span class="product-category-badge">${escapeHtml(product.category || "Mahsulot")}</span>
+        <h1 class="product-detail-title">${escapeHtml(product.name)}</h1>
+        <p class="product-detail-desc">${escapeHtml(product.description || "Tavsif qo'shilmagan.")}</p>
+        <div class="product-detail-meta">
+          <div class="meta-item"><span class="meta-label">Reyting</span><span class="meta-val">${renderStars(product.rating)}</span></div>
+          <div class="meta-item"><span class="meta-label">Fayl hajmi</span><span class="meta-val">${escapeHtml(fileSize)}</span></div>
+          <div class="meta-item"><span class="meta-label">Yuklash turi</span><span class="meta-val">${product.fileUrl ? "HTTPS havola" : "H Market storage"}</span></div>
+        </div>
+        ${
+          downloadUrl
+            ? `<button class="btn-download js-safe-download" type="button" data-url="${escapeAttr(downloadUrl)}" data-name="${escapeAttr(product.name)}">Xavfsiz yuklab olish</button>`
+            : `<button class="btn-download disabled" type="button" disabled>Fayl qo'shilmagan</button>`
+        }
+      </div>
+    </div>`;
 }
 
 function setupSearch() {
   const inputs = document.querySelectorAll(".search-input");
   inputs.forEach((input) => {
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        const q = input.value.trim();
-        window.location.href = q ? `/?search=${encodeURIComponent(q)}` : "/";
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        const value = input.value.trim();
+        location.href = value ? `/?search=${encodeURIComponent(value)}` : "/";
       }
     });
   });
-
-  const btns = document.querySelectorAll(".search-btn");
-  btns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const input = btn.closest("form, .hero-search, .nav-search")?.querySelector("input");
-      if (!input) return;
-      const q = input.value.trim();
-      window.location.href = q ? `/?search=${encodeURIComponent(q)}` : "/";
+  document.querySelectorAll(".search-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      const input = button.closest(".hero-search")?.querySelector("input") || document.querySelector(".search-input");
+      const value = input?.value.trim() || "";
+      location.href = value ? `/?search=${encodeURIComponent(value)}` : "/";
     });
   });
-
-  // Pre-fill search
-  const params = new URLSearchParams(window.location.search);
-  const s = params.get("search");
-  if (s) inputs.forEach((i) => (i.value = s));
 }
 
 function setupMobileMenu() {
-  const btn = document.querySelector(".hamburger");
-  const links = document.querySelector(".nav-links");
-  if (!btn || !links) return;
-  btn.addEventListener("click", () => links.classList.toggle("open"));
-  document.addEventListener("click", (e) => {
-    if (!btn.contains(e.target) && !links.contains(e.target)) {
-      links.classList.remove("open");
+  const button = document.getElementById("hamburger");
+  const links = document.getElementById("nav-links");
+  if (!button || !links) return;
+  button.addEventListener("click", () => links.classList.toggle("open"));
+}
+
+function setupConsentPanel() {
+  const panel = document.getElementById("consent-panel");
+  if (!panel || localStorage.getItem("hm_consent_done") === "1") return;
+  panel.hidden = false;
+
+  document.getElementById("cookie-accept")?.addEventListener("click", () => {
+    localStorage.setItem("hm_cookies", "accepted");
+    localStorage.setItem("hm_consent_done", "1");
+    panel.hidden = true;
+    toast("Cookie ruxsati saqlandi", "success");
+  });
+
+  document.getElementById("notify-ask")?.addEventListener("click", async () => {
+    if (!("Notification" in window)) {
+      toast("Bu brauzer bildirishnomani qo'llab-quvvatlamaydi", "error");
+      return;
     }
+    const result = await Notification.requestPermission();
+    localStorage.setItem("hm_notifications", result);
+    toast(result === "granted" ? "Bildirishnoma ruxsati berildi" : "Bildirishnoma rad etildi", result === "granted" ? "success" : "info");
+  });
+
+  document.getElementById("consent-close")?.addEventListener("click", () => {
+    localStorage.setItem("hm_consent_done", "1");
+    panel.hidden = true;
   });
 }
 
-// ===== PRODUCT DETAIL PAGE =====
-async function initProductPage() {
-  const container = document.getElementById("product-detail");
-  if (!container) return;
+function setupSafeDownloads() {
+  const modal = document.getElementById("download-modal");
+  const confirm = document.getElementById("download-confirm");
+  const text = document.getElementById("download-text");
+  const close = () => {
+    if (modal) modal.hidden = true;
+  };
 
-  const slug = window.location.pathname.replace("/product/", "").replace(/\/$/, "");
-  if (!slug) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-title">Noto'g'ri havola</div></div>`;
-    return;
-  }
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest(".js-safe-download");
+    if (!button) return;
+    const url = button.dataset.url || "";
+    if (!url) return;
+    const isHttps = url.startsWith("https://") || url.startsWith("/.netlify/");
+    if (!isHttps) {
+      toast("Faqat xavfsiz HTTPS fayllarni yuklab olish mumkin", "error");
+      return;
+    }
+    if (confirm && modal) {
+      confirm.href = url;
+      confirm.target = url.startsWith("http") ? "_blank" : "_self";
+      if (text) text.textContent = `"${button.dataset.name || "Fayl"}" xavfsiz havola orqali ochiladi. 500 MB gacha katta fayllarda yuklash vaqt olishi mumkin.`;
+      modal.hidden = false;
+    }
+  });
 
-  container.innerHTML = `<div style="text-align:center;padding:80px"><div class="spinner"></div><p style="color:var(--text-muted);margin-top:16px">Yuklanmoqda...</p></div>`;
-
-  const { ok, data } = await safeFetch(`${API}/products?slug=${encodeURIComponent(slug)}`);
-
-  if (!ok || !data || !data.name) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">😕</div>
-        <div class="empty-title">Mahsulot topilmadi</div>
-        <div class="empty-text">Ushbu mahsulot mavjud emas yoki o'chirilgan.</div>
-        <a href="/" style="display:inline-block;margin-top:24px;background:var(--gradient);color:white;padding:12px 28px;border-radius:var(--radius-pill);text-decoration:none;font-weight:700">Bosh sahifaga qaytish</a>
-      </div>`;
-    return;
-  }
-
-  const p = data;
-  const icon = getCategoryIcon(p.category);
-  const imgHtml = p.imageKey
-    ? `<img src="${API}/file?key=${encodeURIComponent(p.imageKey)}" alt="${p.name}" class="product-detail-img" onerror="this.outerHTML='<div class=\\"product-detail-placeholder\\">${icon}</div>'">`
-    : `<div class="product-detail-placeholder">${icon}</div>`;
-
-  const dlBtn = p.fileKey
-    ? `<a href="${API}/file?key=${encodeURIComponent(p.fileKey)}&download=1" class="btn-download" download>⬇ Yuklab olish</a>`
-    : `<button class="btn-download disabled" disabled title="Fayl mavjud emas">📁 Fayl yuklanmagan</button>`;
-
-  document.title = `${p.name} — H Market`;
-
-  container.innerHTML = `
-    <div class="product-detail-grid">
-      <div class="product-detail-cover">${imgHtml}</div>
-      <div class="product-detail-info">
-        <span class="product-category-badge" style="font-size:0.85rem;padding:6px 16px">${icon} ${p.category}</span>
-        <h1 class="product-detail-title">${p.name}</h1>
-        <div class="product-detail-rating">
-          <span class="stars" style="font-size:1.2rem">${renderStars(p.rating || 0)}</span>
-          <span style="font-weight:700;font-size:1rem">${(p.rating || 0).toFixed(1)} / 5.0</span>
-        </div>
-        <p class="product-detail-desc">${p.description || "Tavsif mavjud emas."}</p>
-        <div class="product-detail-meta">
-          <div class="meta-item"><span class="meta-label">Kategoriya</span><span class="meta-val">${p.category}</span></div>
-          <div class="meta-item"><span class="meta-label">Qo'shilgan sana</span><span class="meta-val">${new Date(p.createdAt).toLocaleDateString("uz-UZ")}</span></div>
-        </div>
-        <div class="product-detail-actions">${dlBtn}</div>
-      </div>
-    </div>`;
+  document.getElementById("download-close")?.addEventListener("click", close);
+  modal?.addEventListener("click", (event) => {
+    if (event.target === modal) close();
+  });
 }
 
-// ===== PAGE INIT =====
+function updateActiveTabs() {
+  const params = new URLSearchParams(location.search);
+  const active = params.get("category") || "";
+  document.querySelectorAll(".cat-tab").forEach((tab) => {
+    tab.classList.toggle("active", tab.dataset.cat === active);
+  });
+}
+
+function updateCounts(products) {
+  const all = Array.isArray(products) ? products : [];
+  document.querySelectorAll("[data-count]").forEach((el) => {
+    const category = el.dataset.count;
+    el.textContent = `${all.filter((item) => item.category === category).length} ta`;
+  });
+}
+
+function escapeHtml(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function escapeAttr(value = "") {
+  return escapeHtml(value).replace(/`/g, "&#096;");
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   setupMobileMenu();
   setupSearch();
+  setupConsentPanel();
+  setupSafeDownloads();
 
-  const page = document.body.dataset.page;
-  if (page === "home") initHomePage();
-  if (page === "product") initProductPage();
+  if (document.body.dataset.page === "home") initHomePage();
+  if (document.body.dataset.page === "product") initProductPage();
 });
