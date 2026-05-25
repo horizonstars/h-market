@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>H Market — Raqamli Do'kon</title>
+  <meta name="description" content="H Market — Ilovalar, Saytlar, Kitoblar va Jurnallar uchun raqamli do'kon" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Spinner */
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--blue-deep);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Search results heading */
+    .search-result-heading {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    .search-result-heading strong { color: var(--blue-deep); }
+  </style>
+</head>
+<body data-page="home">
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <rect x="1" y="1" width="7" height="20" rx="3.5" fill="white"/>
+          <rect x="14" y="1" width="7" height="20" rx="3.5" fill="white"/>
+          <rect x="8" y="8.5" width="6" height="5" fill="white"/>
+          <polygon points="9.5,10 14,11.5 9.5,13" fill="#0066FF"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">H Market</span>
+    </a>
+
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/" class="active">Bosh sahifa</a></li>
+      <li><a href="/?category=Ilovalar">Ilovalar</a></li>
+      <li><a href="/?category=Saytlar">Saytlar</a></li>
+      <li><a href="/?category=Kitoblar">Kitoblar</a></li>
+      <li><a href="/?category=Jurnallar">Jurnallar</a></li>
+      <li><a href="#aloqa">Aloqa</a></li>
+      <li class="nav-search" style="margin-left:8px">
+        <svg class="nav-search-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+        </svg>
+        <input type="text" placeholder="Qidirish..." class="search-input" />
+      </li>
+    </ul>
+
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Yangi mahsulotlar mavjud
+    </div>
+
+    <div class="hero-logo">
+      <!-- Inline SVG Logo matching uploaded image -->
+      <svg class="hero-logo-img" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="hgrad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#0066FF"/>
+            <stop offset="100%" style="stop-color:#06D6E0"/>
+          </linearGradient>
+        </defs>
+        <!-- Left pillar -->
+        <rect x="22" y="18" width="52" height="164" rx="26" fill="url(#hgrad)"/>
+        <!-- Right pillar -->
+        <rect x="126" y="18" width="52" height="164" rx="26" fill="url(#hgrad)"/>
+        <!-- Crossbar top-left piece -->
+        <rect x="74" y="70" width="52" height="30" rx="0" fill="url(#hgrad)"/>
+        <!-- Crossbar bottom piece -->
+        <rect x="74" y="100" width="52" height="30" rx="0" fill="url(#hgrad)"/>
+        <!-- Play button (white triangle) -->
+        <polygon points="82,82 124,100 82,118" fill="white" opacity="0.95"/>
+        <!-- Cover gaps cleanly -->
+        <rect x="74" y="70" width="52" height="60" rx="0" fill="url(#hgrad)" opacity="0"/>
+      </svg>
+    </div>
+
+    <h1 class="hero-title">H Market</h1>
+    <p class="hero-subtitle">
+      Ilovalar, saytlar, kitoblar va jurnallarni bir joydan toping va yuklab oling
+    </p>
+
+    <div class="hero-search">
+      <input type="text" placeholder="Ilovalar, kitoblar, saytlar..." class="search-input" id="hero-search-input" />
+      <button class="hero-search-btn search-btn">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+        </svg>
+        Qidirish
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <span class="stat-num" id="stat-total">—</span>
+      <span class="stat-label">Jami mahsulotlar</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">4</span>
+      <span class="stat-label">Kategoriyalar</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">100%</span>
+      <span class="stat-label">Bepul yuklab olish</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">24/7</span>
+      <span class="stat-label">Xizmat vaqti</span>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORIES SECTION -->
+<section class="section" style="padding-bottom:0">
+  <div class="section-header">
+    <h2 class="section-title">Kategoriyalar <span>bo'yicha</span></h2>
+  </div>
+  <div class="categories-grid">
+    <a href="/?category=Ilovalar" class="category-card">
+      <div class="cat-card-icon">📱</div>
+      <div class="cat-card-name">Ilovalar</div>
+      <div class="cat-card-count" data-cat="Ilovalar">— ta mahsulot</div>
+    </a>
+    <a href="/?category=Saytlar" class="category-card">
+      <div class="cat-card-icon">🌐</div>
+      <div class="cat-card-name">Saytlar</div>
+      <div class="cat-card-count" data-cat="Saytlar">— ta mahsulot</div>
+    </a>
+    <a href="/?category=Kitoblar" class="category-card">
+      <div class="cat-card-icon">📚</div>
+      <div class="cat-card-name">Kitoblar</div>
+      <div class="cat-card-count" data-cat="Kitoblar">— ta mahsulot</div>
+    </a>
+    <a href="/?category=Jurnallar" class="category-card">
+      <div class="cat-card-icon">📰</div>
+      <div class="cat-card-name">Jurnallar</div>
+      <div class="cat-card-count" data-cat="Jurnallar">— ta mahsulot</div>
+    </a>
+  </div>
+</section>
+
+<!-- PRODUCTS SECTION -->
+<section class="section">
+  <div class="section-header" id="products-header">
+    <h2 class="section-title" id="products-title">Barcha <span>Mahsulotlar</span></h2>
+  </div>
+
+  <!-- Category filter tabs -->
+  <div class="category-tabs">
+    <a href="/" class="cat-tab" data-cat="">
+      <span class="cat-icon">🏠</span> Hammasi
+    </a>
+    <a href="/?category=Ilovalar" class="cat-tab" data-cat="Ilovalar">
+      <span class="cat-icon">📱</span> Ilovalar
+    </a>
+    <a href="/?category=Saytlar" class="cat-tab" data-cat="Saytlar">
+      <span class="cat-icon">🌐</span> Saytlar
+    </a>
+    <a href="/?category=Kitoblar" class="cat-tab" data-cat="Kitoblar">
+      <span class="cat-icon">📚</span> Kitoblar
+    </a>
+    <a href="/?category=Jurnallar" class="cat-tab" data-cat="Jurnallar">
+      <span class="cat-icon">📰</span> Jurnallar
+    </a>
+  </div>
+
+  <div id="products-grid" class="products-grid"></div>
+</section>
+
+<!-- CONTACT SECTION -->
+<section id="aloqa" class="section" style="background:var(--bg-card);border-radius:var(--radius);border:1.5px solid var(--border);text-align:center;padding:60px 40px">
+  <h2 class="section-title" style="margin-bottom:12px">Biz bilan <span>Bog'laning</span></h2>
+  <p style="color:var(--text-muted);margin-bottom:32px;font-size:0.95rem">Savollar, takliflar yoki hamkorlik uchun murojaat qiling</p>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+    <a href="mailto:admin@hmarket.uz" style="display:inline-flex;align-items:center;gap:8px;background:var(--gradient);color:white;padding:14px 28px;border-radius:var(--radius-pill);text-decoration:none;font-weight:700;box-shadow:0 4px 16px rgba(0,102,255,0.25)">
+      📧 Email yuborish
+    </a>
+    <a href="https://t.me/hmarket_uz" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:var(--bg);border:2px solid var(--border);color:var(--text);padding:14px 28px;border-radius:var(--radius-pill);text-decoration:none;font-weight:700">
+      ✈️ Telegram
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="nav-logo-text" style="color:white;font-family:'Sora',sans-serif;font-size:1.3rem;font-weight:800;display:block;margin-bottom:12px">H Market</span>
+      <p class="footer-desc">Raqamli mahsulotlar do'koni — ilovalar, saytlar, kitoblar va jurnallarni bepul yuklab oling.</p>
+    </div>
+    <div>
+      <div class="footer-heading">Kategoriyalar</div>
+      <ul class="footer-links">
+        <li><a href="/?category=Ilovalar">📱 Ilovalar</a></li>
+        <li><a href="/?category=Saytlar">🌐 Saytlar</a></li>
+        <li><a href="/?category=Kitoblar">📚 Kitoblar</a></li>
+        <li><a href="/?category=Jurnallar">📰 Jurnallar</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Sayt</div>
+      <ul class="footer-links">
+        <li><a href="/">Bosh sahifa</a></li>
+        <li><a href="#aloqa">Aloqa</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Texnologiya</div>
+      <ul class="footer-links">
+        <li><a href="https://netlify.com" target="_blank">Netlify</a></li>
+        <li><a href="https://docs.netlify.com/blobs/overview/" target="_blank">Netlify Blobs</a></li>
+        <li><a href="https://docs.netlify.com/functions/overview/" target="_blank">Netlify Functions</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 H Market. Barcha huquqlar himoyalangan.</span>
+    <span>Netlify bilan ishlaydi ⚡</span>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+  // Update title & stat based on URL params
+  document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const cat = params.get("category");
+    const search = params.get("search");
+    const titleEl = document.getElementById("products-title");
+
+    if (cat) {
+      titleEl.innerHTML = `<span>${cat}</span>`;
+      document.title = `${cat} — H Market`;
+    } else if (search) {
+      titleEl.innerHTML = `"<span>${search}</span>" — Qidiruv natijalari`;
+      document.title = `Qidiruv: ${search} — H Market`;
+    }
+
+    // Update stat after products load
+    const observer = new MutationObserver(() => {
+      const cards = document.querySelectorAll(".product-card");
+      const stat = document.getElementById("stat-total");
+      if (stat) stat.textContent = cards.length > 0 ? cards.length + "+" : "—";
+    });
+    const grid = document.getElementById("products-grid");
+    if (grid) observer.observe(grid, { childList: true });
+  });
+</script>
+</body>
+</html>

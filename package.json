@@ -1,0 +1,19 @@
+{
+  "name": "h-market",
+  "version": "1.0.0",
+  "description": "H Market - Mini Play Market",
+  "private": true,
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'Static site - no build step needed'"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^7.3.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
