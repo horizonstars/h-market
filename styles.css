@@ -172,7 +172,7 @@ img { max-width: 100%; }
 
 .hero {
   width: min(1180px, calc(100% - 32px));
-  min-height: calc(100svh - 72px);
+  min-height: min(820px, calc(100svh - 72px));
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(280px, 0.78fr) minmax(340px, 1fr);
@@ -680,6 +680,7 @@ img { max-width: 100%; }
   .category-tabs { justify-content: flex-start; }
   .feature-card { min-height: 180px; padding: 26px; }
   .consent-panel { grid-template-columns: 1fr; }
+  .consent-panel { width: auto; left: 18px; right: 18px; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
